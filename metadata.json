@@ -1,0 +1,6 @@
+{
+  "name": "FixNear AI",
+  "description": "AI-powered local service marketplace that analyzes everyday home and mechanical problems to connect you with the right verified professional.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
