@@ -1,984 +1,205 @@
-FixNear.AI 🇵🇰
-AI-Powered Local Service Discovery and Problem Triage for Pakistan
-Describe the problem. Find the right solution.
 
-🔗 Live Application: https://fixnear-ai.vercel.app
+ FixNear.AI — AI-Powered Home Service Triage & Local Marketplace
 
-📌 Project Overview
+ Instant AI diagnostics and verified local technician matching for households across major Pakistani cities.
 
-FixNear.AI is an AI-powered local service discovery platform designed to help people in Pakistan find the right professional for everyday household, technical, automotive, and repair-related problems.
+Live Application:https://fixnear-ai.vercel.app
 
-The platform solves a simple but common problem:
+---
 
-People often know that something is wrong, but they do not know what type of professional they need.
 
-For example, a user may know that:
+## 📌 1. Project Overview & Problem Statement
 
-their air conditioner is not cooling,
-their electricity keeps tripping,
-their water pump has stopped working,
-their Wi-Fi is slow,
-their motorcycle will not start,
-their washing machine is making unusual noises,
+### The Problem
+Home maintenance and appliance repairs across major urban centers in Pakistan (Karachi, Lahore, Islamabad, Rawalpindi, etc.) are plagued by several friction points:
+* **Misdiagnosed Issues:** Homeowners often struggle to explain technical electrical, plumbing, or HVAC problems accurately to technicians, leading to wrong tools being brought or incorrect spare parts purchased.
+* **Price Opaque Markets:** Lack of standard pricing leads to overcharging, erratic quotes, and unexpected costs for routine household fixes.
+* **Language Barriers:** Existing digital platforms predominantly require formal English, creating friction for users comfortable communicating in Roman Urdu.
+* **Unverified Providers:** Finding reliable, location-aware local mechanics or technicians with transparent customer ratings remains difficult.
 
-but they may not know whether they need an electrician, an appliance technician, an AC technician, a plumber, a mechanic, or another specialist.
+### The Solution
+**FixNear.AI** bridges the gap between distressed homeowners and nearby verified technicians through instant, AI-driven diagnostics:
+1. **Bilingual Triage:** Homeowners describe their problem in plain English or Roman Urdu (e.g., *"AC trip ho raha hai jab compression chalay"*).
+2. **Structured Analysis:** Google Gemini analyzes the input and generates an actionable 6-point diagnostic report along with estimated costs in Pakistani Rupees (PKR).
+3. **Local Marketplace:** The platform automatically filters and ranks verified local technicians nearby based on skill alignment, locality, and user reviews.
+4. **End-to-End Tracking:** Generates a unique tracking ID (`FN-XXXXX`) to manage bookings through an intuitive dashboard.
 
-FixNear.AI allows users to describe the problem naturally in English or Roman Urdu. The AI analyzes the description and recommends the most appropriate service category and professional.
+---
 
-The user can then:
 
-Select their location.
-Describe their problem.
-Receive an AI-powered analysis.
-View the recommended service category.
-Browse matching local service providers.
-Select a provider.
-Submit a service request.
-Receive a unique request tracking ID.
-View their submitted requests.
 
-The result is a complete end-to-end journey from:
+## 🚀 2. Key Features
 
-PROBLEM
-   ↓
-AI UNDERSTANDING
-   ↓
-SERVICE RECOMMENDATION
-   ↓
-LOCAL PROVIDER DISCOVERY
-   ↓
-SERVICE REQUEST
-   ↓
-REQUEST TRACKING
-🎯 The Real-World Problem
+* 🤖 **Bilingual AI Problem Analyzer:** Translates and interprets repair queries submitted in both English and Roman Urdu.
+* 📋 **6-Point Structured Diagnostic Report:** Outputs problem severity, potential root causes, recommended safety precautions, required tools/parts, immediate quick fixes, and cost expectations.
+* 🇵🇰 **Localized PKR Cost Estimation:** Delivers realistic local Pakistani market price ranges for labor and spare parts.
+* 📍 **Location-Aware Provider Marketplace:** Search and filter verified technicians by city, rating, service type, and proximity.
+* 🎫 **Seamless Service Booking System:** Complete booking pipeline generating unique `FN-XXXXX` tracking identifiers for each job.
+* 📊 **My Requests Dashboard:** Centralized client panel to monitor active, pending, and completed repair requests in real-time.
+* ⚡ **Responsive & Lightweight UI:** Fast interface optimized for low-bandwidth mobile networks across Pakistan.
 
-Finding a reliable service professional is a common problem for households across Pakistan.
+---
 
-When a household problem occurs, users typically have to:
 
-Search Google or social media.
-Guess what type of technician they need.
-Search through unrelated results.
-Contact multiple people.
-Explain the problem repeatedly.
-Try to estimate whether the quoted price is reasonable.
-Find someone who operates in their area.
 
-This process can be confusing, especially for people who do not understand technical terminology.
+## 🧠 3. AI Feature & System Prompt Architecture
 
-For example, a user may write:
+FixNear.AI uses Google's `gemini-2.5-flash` model via the `@google/genai` SDK to evaluate household issues securely through a dedicated backend API route (`/api/analyze-problem`).
 
-"Mera AC chal raha hai lekin thanda nahi kar raha."
+### How It Works
+1. The user inputs their issue in free-form text or audio transcript (English or Roman Urdu).
+2. The payload is sent to the server-side API proxy to keep API keys secure.
+3. The model processes the request against a structured system prompt and returns a validated JSON structure.
+4. Fallback mechanisms handle edge cases or connection interruptions gracefully without breaking the user session.
 
-The user may not know whether the problem is related to:
+### AI System Prompt Specification
 
-the compressor,
-gas/refrigerant,
-airflow,
-electrical components,
-filters,
-or another technical issue.
+```text
+You are FixNear.AI's expert home maintenance and technical service diagnostic engine specializing in Pakistani household repairs (HVAC, Electrical, Plumbing, Appliance Repair, Carpentry, and General Contracting).
 
-They do not necessarily need a technical diagnosis. They first need help understanding:
+Your objective is to analyze user-submitted repair requests written in English or Roman Urdu, perform a safety and technical triage, and return a strict, valid JSON object containing a 6-point structured diagnostic report.
 
-What kind of professional should I contact?
+OUTPUT CONSTRAINTS:
+1. Language: Produce explanations in clear, accessible language, accommodating both English and Roman Urdu nuances where appropriate.
+2. Currency: All cost estimations MUST be provided in Pakistani Rupees (PKR), reflecting realistic current market rates for labor and materials in major urban areas of Pakistan.
+3. Safety First: Explicitly highlight immediate hazards (e.g., electrical shock risks, gas leaks, water damage risks).
 
-This is the problem FixNear.AI addresses.
+REQUIRED JSON RESPONSE FORMAT:
+{
+  "summary": "Brief summary of the issue",
+  "category": "Electrical | Plumbing | HVAC | Appliance | Carpentry | General",
+  "severity": "Low | Medium | High | Emergency",
+  "possibleCauses": ["Cause 1", "Cause 2", "Cause 3"],
+  "safetyPrecautions": ["Precaution 1", "Precaution 2"],
+  "recommendedToolsOrParts": ["Item 1", "Item 2"],
+  "immediateFixes": ["Step 1", "Step 2"],
+  "estimatedCostPKR": {
+    "min": 0,
+    "max": 0,
+    "breakdown": "Explanation of labor vs parts cost in PKR"
+  }
+}
 
-💡 The FixNear.AI Solution
+```
 
-FixNear.AI acts as an intelligent first step between a user and the local service marketplace.
 
-Instead of asking users to search for a technician immediately, the platform allows them to begin with the problem itself.
 
-Example:
-User Input
-Mera AC thanda nahi kar raha.
-AI Output
-Recommended Service:
-AC Repair
 
-Professional Required:
-AC Technician
+## 🛠️ 4. Tech Stack & Services
 
-Possible Issue:
-Possible cooling or airflow-related issue.
+| Layer | Technology / Service |
+| --- | --- |
+| **AI Engine** | Google Gemini API (`gemini-2.5-flash` via `@google/genai`) |
+| **Frontend Framework** | React 18 with TypeScript |
+| **Build Tooling** | Vite |
+| **Styling** | Tailwind CSS v4 |
+| **Icons** | Lucide Icons (`lucide-react`) |
+| **Backend / API Router** | Node.js with Express (Serverless Proxy Routes) |
+| **Deployment** | Vercel Platform |
 
-Urgency:
-Medium
+---
 
-Safe First Step:
-Avoid attempting to open or repair the internal components yourself.
 
-Recommended Next Step:
-Contact a qualified AC technician for inspection.
+## 🖼️ 5. Application Screenshots
 
-Estimated Cost:
-Local market estimate in PKR.
+### 1. AI Problem Analyzer & Input Interface
 
-The user is then shown suitable providers associated with the recommended service category and selected location.
+*User enters an issue in Roman Urdu or English to begin instant diagnosis.*
 
-This makes the process:
+---
 
-Problem-first instead of technician-first.
+### 2. Structured Diagnostic Report & Market Cost Estimate
 
-That is the central product idea behind FixNear.AI.
+*The 6-point structured AI breakdown displaying cause analysis, safety alerts, and PKR pricing.*
 
-👥 Who Is FixNear.AI For?
+---
 
-FixNear.AI is designed for:
+### 3. Technician Marketplace & Booking Flow
 
-🏠 Households
+*Verified local technicians sorted by proximity, rating, and expertise with booking triggers.*
 
-People who need help finding the right technician for household problems.
+---
 
-👨‍🎓 Students
+### 4. My Requests Tracking Dashboard
 
-Students living away from home who may not know local technicians or technical terminology.
+*Real-time order tracker displaying status updates with unique `FN-XXXXX` tracking keys.*
 
-🏢 Renters
 
-Tenants who need to quickly identify the appropriate service professional for a problem in their residence.
 
-👵 Elderly Users
 
-Users who may find it difficult to search through multiple service providers manually.
+## 💻 6. Local Setup & Execution Guide
 
-🔧 Non-Technical Users
+Follow these steps to run **FixNear.AI** locally on your machine.
 
-People who can describe a problem but do not know the technical name for it.
+### Prerequisites
 
-🇵🇰 Pakistani Users
+* **Node.js**: `v18.0.0` or higher
+* **npm**: `v9.0.0` or higher
+* **Google Gemini API Key**: Obtainable from [Google AI Studio](https://aistudio.google.com/)
 
-Users who naturally communicate using a mixture of English, Urdu, and Roman Urdu.
+### Step 1: Clone the Repository
 
-⭐ What Makes FixNear.AI Different?
-
-FixNear.AI is not designed as a generic international marketplace.
-
-It is specifically localized for Pakistan.
-
-The platform focuses on:
-
-🇵🇰 Pakistani Locations
-
-The marketplace includes Pakistani cities and local areas.
-
-💬 Roman Urdu Understanding
-
-Users can describe problems using the language they naturally use in everyday communication.
-
-For example:
-
-Mera AC thanda nahi kar raha.
-Bijli baar baar ja rahi hai.
-Meri bike start nahi ho rahi.
-Pani ki motor kaam nahi kar rahi.
-💰 Pakistani Currency
-
-Service estimates are presented in Pakistani Rupees (PKR).
-
-🛠️ Local Service Categories
-
-The platform includes services commonly required in Pakistan, including:
-
-AC repair
-Electricians
-Plumbers
-Generator repair
-UPS repair
-Solar technicians
-Water pump repair
-Appliance repair
-Mobile repair
-Laptop repair
-Internet and Wi-Fi technicians
-Mechanics
-Motorcycle repair
-Car AC repair
-CCTV services
-Locksmith services
-Pest control
-Water tank cleaning
-🚀 Complete User Journey
-Step 1: Choose a Location
-
-The user selects a location to make the service search more relevant.
-
-Example:
-
-City:
-Karachi
-
-Area:
-Gulshan-e-Iqbal
-Step 2: Describe the Problem
-
-The user enters a natural-language problem.
-
-Example:
-
-My AC is running but it is not cooling the room.
-
-or:
-
-Mera AC room thanda nahi kar raha.
-Step 3: AI Analysis
-
-The problem is sent to the AI system.
-
-The AI identifies the most relevant service category and generates a structured analysis.
-
-Step 4: View the Recommendation
-
-The user receives a structured result containing:
-
-Recommended service
-Professional required
-Possible issue
-Urgency
-Safe first step
-Recommended next step
-Estimated service cost
-Step 5: Browse Matching Providers
-
-The marketplace displays service providers related to the recommended category.
-
-For example:
-
-AI Recommendation:
-AC Repair
-
-↓
-
-Marketplace:
-AC Repair Providers
-Step 6: Select a Provider
-
-The user can review provider information, including:
-
-Name
-Rating
-Location
-Availability
-Starting price
-Services offered
-Step 7: Submit a Service Request
-
-The user completes the service request form.
-
-The request includes:
-
-Full name
-Phone number
-Location
-Preferred time
-Problem description
-Selected provider
-Recommended service category
-Step 8: Receive a Request ID
-
-A unique request identifier is generated.
-
-Example:
-
-FN-7A92K4
-
-This allows the user to identify their service request.
-
-Step 9: View My Requests
-
-Users can access their submitted service requests through the My Requests section.
-
-✨ Features
-🤖 AI Problem Analyzer
-
-The central feature of FixNear.AI is its AI-powered problem analysis system.
-
-Users do not need to know the technical name of their problem.
-
-They simply describe what they are experiencing.
-
-The AI then converts the unstructured problem description into a structured service recommendation.
-
-🌐 English and Roman Urdu Support
-
-The AI is designed to understand common English and Roman Urdu descriptions.
-
-English:
-My washing machine is making a loud noise.
-Roman Urdu:
-Meri washing machine bohat awaaz kar rahi hai.
-
-The goal is to allow users to communicate naturally instead of forcing them to use technical terminology.
-
-📋 Structured AI Report
-
-Every AI analysis follows a structured format.
-
-1. Recommended Service
-
-The service category most relevant to the user's problem.
-
-2. Professional Required
-
-The type of technician or professional the user should search for.
-
-3. Possible Issue
-
-A simple, non-definitive explanation of what may be happening.
-
-4. Urgency
-
-The AI classifies the problem as:
-
-Low
-Medium
-High
-5. Safe First Step
-
-A basic, non-dangerous suggestion.
-
-6. Recommended Next Step
-
-The action the user should take next.
-
-💰 Local Cost Estimation
-
-The AI can provide an estimated service cost range based on general Pakistani market conditions.
-
-The estimates are intended for general guidance only.
-
-The final cost may vary depending on:
-
-City
-Location
-Technician
-Parts required
-Complexity of the repair
-Type of equipment
-
-The platform does not present AI estimates as guaranteed final prices.
-
-📍 Location-Aware Provider Discovery
-
-The marketplace uses location information to make provider discovery more relevant.
-
-Users can select locations such as:
-
-Karachi
-Gulshan-e-Iqbal
-North Nazimabad
-DHA
-Clifton
-Lahore
-Gulberg
-Johar Town
-DHA Lahore
-Bahria Town
-Islamabad / Rawalpindi
-F-6
-F-7
-G-11
-Bahria Town Rawalpindi
-
-The system is designed to support expansion to additional cities and areas.
-
-🛠️ Service Provider Marketplace
-
-Provider cards display useful information such as:
-
-Provider name
-Category
-Rating
-Location
-Availability
-Starting price
-Services offered
-
-Providers are displayed based on the service category recommended by the AI.
-
-📝 Service Request Booking
-
-After selecting a provider, users can submit a service request.
-
-The form includes validation to ensure required information is provided.
-
-🆔 FN- Request Tracking
-
-Every service request receives a unique identifier beginning with:
-
-FN-
-
-Example:
-
-FN-7A92K4
-
-This gives every service request a recognizable tracking reference.
-
-📊 My Requests Dashboard
-
-The user can view their previous service requests.
-
-This includes:
-
-Request ID
-Service category
-Provider
-Problem description
-Location
-Request status
-📱 Responsive Interface
-
-The application is designed to work across:
-
-Desktop computers
-Laptops
-Tablets
-Mobile phones
-🧠 AI Implementation
-
-FixNear.AI uses Google's Gemini API as the intelligence layer behind the problem analyzer.
-
-Model Used
-gemini-2.5-flash
-SDK
-@google/genai
-
-The application sends the user's problem description to a server-side API route.
-
-User
- ↓
-React Interface
- ↓
-/api/analyze-problem
- ↓
-Google Gemini API
- ↓
-Structured AI Response
- ↓
-FixNear.AI Result Card
-🔐 Secure AI Architecture
-
-The Gemini API key is not intended to be exposed directly in the client-side application.
-
-Instead, the application uses a server-side route:
-
-/api/analyze-problem
-
-The general process is:
-
-Frontend
-   ↓
-Server API Route
-   ↓
-Gemini API
-   ↓
-AI Response
-   ↓
-Frontend
-
-This architecture helps prevent the API key from being directly exposed in the browser.
-
-The API key is stored as an environment variable:
-
-GEMINI_API_KEY
-🧾 AI System Prompt
-
-The AI system instruction used by FixNear.AI is designed specifically for everyday service triage in Pakistan.
-
-You are FixNear AI, an intelligent everyday problem classification assistant for households in Pakistan.
-
-Your primary responsibility is to understand a user's everyday household, technical, automotive, appliance, or repair-related problem and recommend the most appropriate service category and professional.
-
-Users may describe problems in English or Roman Urdu.
-
-Do not require users to use technical terminology.
-
-Analyze the meaning of the user's description and return a structured recommendation containing:
-
-1. The most appropriate service category.
-2. The professional or technician required.
-3. A simple explanation of what may be happening.
-4. An urgency level: Low, Medium, or High.
-5. Safe preliminary advice.
-6. A recommended next step.
-7. An estimated cost range in Pakistani Rupees when appropriate.
-
-Supported service categories include:
-
-- AC Repair
-- Electrician
-- Plumber
-- Generator Repair
-- UPS Repair
-- Solar Panel Technician
-- Water Pump Repair
-- Appliance Repair
-- Mobile Phone Repair
-- Laptop Repair
-- Computer Repair
-- Internet/Wi-Fi Technician
-- CCTV Installation and Repair
-- Car Mechanic
-- Motorcycle Mechanic
-- Car AC Repair
-- Battery and Electrical Services
-- Tyre and Puncture Services
-- Locksmith
-- Pest Control
-- Water Tank Cleaning
-- Home Cleaning
-
-The AI should understand common Pakistani English and Roman Urdu phrases.
-
-Examples include:
-
-"Mera AC thanda nahi kar raha."
-
-"Bijli baar baar ja rahi hai."
-
-"Pani leak ho raha hai."
-
-"Meri bike start nahi ho rahi."
-
-"Mobile charge nahi ho raha."
-
-"WiFi slow chal raha hai."
-
-"Fridge thanda nahi kar raha."
-
-"Geyser kaam nahi kar raha."
-
-Do not claim to provide a confirmed technical diagnosis.
-
-Do not provide dangerous repair instructions.
-
-Do not instruct users to open electrical, gas, refrigerant, or other hazardous systems.
-
-If the situation may involve immediate danger, advise the user to stop using the equipment and contact a qualified professional.
-
-Use simple, clear, practical language.
-🧪 Example AI Classifications
-Example 1: AC
-Input
-Mera AC thanda nahi kar raha.
-Output
-Category:
-AC Repair
-
-Professional:
-AC Technician
-
-Urgency:
-Medium
-Example 2: Electrical Issue
-Input
-Bijli baar baar trip ho rahi hai.
-Output
-Category:
-Electrician
-
-Professional:
-Electrical Technician
-
-Urgency:
-High
-Example 3: Motorcycle
-Input
-Meri bike start nahi ho rahi.
-Output
-Category:
-Motorcycle Repair
-
-Professional:
-Motorcycle Mechanic
-
-Urgency:
-Medium
-Example 4: Internet
-Input
-Mera WiFi bohat slow chal raha hai.
-Output
-Category:
-Internet/Wi-Fi Technician
-
-Professional:
-Network Technician
-
-Urgency:
-Low
-🏗️ Technical Architecture
-┌────────────────────────────────────┐
-│            USER INTERFACE          │
-│         React + TypeScript         │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│         PROBLEM INPUT FORM         │
-│      English / Roman Urdu Input    │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│        SERVER-SIDE API ROUTE       │
-│        /api/analyze-problem        │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│          GOOGLE GEMINI API         │
-│          gemini-2.5-flash          │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│       STRUCTURED AI RESPONSE       │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│        SERVICE RECOMMENDATION       │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│       FILTERED PROVIDERS            │
-│       LOCATION + CATEGORY           │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│       SERVICE REQUEST FORM          │
-└──────────────────┬─────────────────┘
-                   │
-                   ▼
-┌────────────────────────────────────┐
-│        FN- REQUEST TRACKING         │
-└────────────────────────────────────┘
-🧰 Technology Stack
-Technology	Role
-React 18	Frontend interface
-TypeScript	Type-safe development
-Vite	Development and build tooling
-Tailwind CSS v4	Styling and responsive design
-Node.js	Server-side runtime
-Express	Backend API support
-Google Gemini API	AI problem analysis
-Gemini 2.5 Flash	AI model
-@google/genai	Gemini API SDK
-Lucide Icons	Interface icons
-GitHub	Version control and public repository
-Vercel	Deployment and hosting
-🖼️ Application Screenshots
-
-Important: Put your actual screenshots inside a folder called screenshots in the root of your GitHub repository.
-
-Recommended structure:
-
-screenshots/
-├── homepage.png
-├── ai-analysis.png
-├── marketplace.png
-├── service-request.png
-└── my-requests.png
-🏠 Homepage and AI Problem Analyzer
-
-The homepage introduces the FixNear.AI concept and allows users to describe their problem.
-
-🤖 AI Analysis Results
-
-The AI transforms a natural-language problem into a structured service recommendation.
-
-🛠️ Local Service Marketplace
-
-Users can browse providers relevant to their recommended service category and location.
-
-📝 Service Request
-
-Users can select a provider and submit their service request.
-
-📊 My Requests Dashboard
-
-Users can view their submitted requests and FN- tracking IDs.
-
-💻 Running the Project Locally
-Prerequisites
-
-You need:
-
-Node.js 18 or later
-npm
-Git
-Google Gemini API key
-1. Clone the Repository
-git clone YOUR_PUBLIC_GITHUB_REPOSITORY_URL
-
-Navigate to the project:
-
+```bash
+git clone [https://github.com/your-username/fixnear-ai.git](https://github.com/your-username/fixnear-ai.git)
 cd fixnear-ai
-2. Install Dependencies
+
+```
+
+### Step 2: Install Dependencies
+
+```bash
 npm install
-3. Configure Environment Variables
 
-Create a .env file in the project root.
+```
 
-GEMINI_API_KEY=your_gemini_api_key_here
-4. Run the Development Server
+### Step 3: Configure Environment Variables
+
+Create a `.env` file in the root directory of the project:
+
+```env
+GEMINI_API_KEY=your_google_gemini_api_key_here
+PORT=3000
+
+```
+
+### Step 4: Run Development Server
+
+```bash
 npm run dev
 
-The application will be available at the local development URL shown in the terminal.
 
-Usually:
+Open your browser and navigate to `http://localhost:5173` (or the port specified in your Vite output).
 
-http://localhost:5173
-🏭 Production Build
+### Step 5: Build for Production
 
-To generate a production build:
+To test or trigger a production build locally:
 
+```bash
 npm run build
-
-To run the production application:
-
 npm start
-🔐 Environment Variables
-Variable	Purpose
-GEMINI_API_KEY	Authenticates requests to the Google Gemini API
-Security Rules
 
-Never:
 
-Commit .env to GitHub.
-Place the API key directly in frontend code.
-Share the API key in screenshots.
-Include API keys in the README.
-Commit secret credentials to the repository.
 
-The .gitignore file should include:
+## 📄 7. License & Acknowledgments
 
-.env
-.env.local
-.env.*.local
-📁 Project Structure
+* License: MIT License.
+* Built With: [Google AI Studio](https://aistudio.google.com/) & [Vercel](https://vercel.com/).
 
-A simplified project structure is:
 
-fixnear-ai/
-│
-├── public/
-│   └── assets/
-│
-├── src/
-│   ├── components/
-│   │   ├── Analyzer/
-│   │   ├── Providers/
-│   │   ├── Requests/
-│   │   └── UI/
-│   │
-│   ├── pages/
-│   │
-│   ├── services/
-│   │   └── ai/
-│   │
-│   ├── types/
-│   │
-│   ├── App.tsx
-│   └── main.tsx
-│
-├── api/
-│   └── analyze-problem/
-│
-├── screenshots/
-│
-├── .env.example
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── README.md
-🚀 Deployment
 
-The live application is deployed on Vercel.
+| Information         | Details                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| Project Name        | FixNear.AI                                                     |
+| Project Type        | AI-Powered Local Service Marketplace                           |
+| Target Market       | Pakistan                                                       |
+| AI Model            | Gemini 2.5 Flash                                               |
+| Primary AI Function | Problem Triage and Service Recommendation                      |
+| Supported Input     | English and Roman Urdu                                         |
+| Currency            | Pakistani Rupees (PKR)                                         |
+| Deployment          | Vercel                                                         |
+| Source Code         | Public GitHub Repository                                       |
+| Live Application    | [https://fixnear-ai.vercel.app](https://fixnear-ai.vercel.app) |
 
-Live URL
 
-🔗 https://fixnear-ai.vercel.app
 
-The deployed application allows users to interact with the complete FixNear.AI workflow.
 
-The deployment demonstrates:
-
-A live public application
-AI-powered functionality
-Interactive marketplace features
-Service request submission
-Request tracking
-🧪 Functional Testing
-
-The application was designed around the following user scenarios.
-
-Test Case 1: AC Problem
-Input
-My AC is running but it is not cooling.
-Expected Result
-AC Repair
-Test Case 2: Electrical Problem
-Input
-Bijli baar baar trip ho rahi hai.
-Expected Result
-Electrician
-Test Case 3: Plumbing Problem
-Input
-Water is leaking from under my kitchen sink.
-Expected Result
-Plumber
-Test Case 4: Motorcycle Problem
-Input
-Meri bike start nahi ho rahi.
-Expected Result
-Motorcycle Mechanic
-Test Case 5: Service Request
-
-The system should allow a user to:
-
-Select a provider.
-Enter required information.
-Submit the request.
-Receive an FN- request ID.
-View the request in My Requests.
-⚠️ AI Safety and Limitations
-
-FixNear.AI is designed as a service triage and discovery tool.
-
-It is not intended to replace:
-
-Certified technicians
-Engineers
-Professional inspections
-Emergency services
-
-The AI provides an initial recommendation based on the user's description.
-
-It does not physically inspect equipment.
-
-Therefore, AI results should be treated as:
-
-Guidance for finding the appropriate type of professional, not a confirmed technical diagnosis.
-
-Users should contact qualified professionals for actual repair and inspection.
-
-🔮 Future Development Roadmap
-Phase 1: Current MVP
-AI problem classification
-English and Roman Urdu input
-Service recommendations
-Local provider marketplace
-Location filtering
-Service requests
-FN- tracking IDs
-My Requests dashboard
-Phase 2: Verified Provider Ecosystem
-
-Future versions could allow technicians to register and create profiles.
-
-Potential features:
-
-Identity verification
-Business verification
-Skill verification
-Verified badges
-Provider onboarding
-Phase 3: Real-Time Location Matching
-
-The platform could use:
-
-GPS
-Maps
-Distance calculations
-Real-time availability
-
-to match users with nearby providers.
-
-Phase 4: Reviews and Ratings
-
-Users could rate providers based on:
-
-Service quality
-Professionalism
-Pricing
-Response time
-Phase 5: Digital Payments
-
-Potential payment options could include:
-
-Online payment
-Cash on service
-Digital receipts
-Phase 6: Voice and Image AI
-
-Users could:
-
-Speak their problem in Urdu
-Speak in Roman Urdu
-Upload an image of a damaged appliance
-Upload a picture of a leak or broken component
-
-The AI could then help identify the appropriate service category.
-
-📊 Product Impact
-
-FixNear.AI aims to reduce the confusion between:
-
-"I have a problem"
-
-and:
-
-"I know exactly which professional I need."
-
-The platform creates an intelligent bridge between these two points.
-
-Instead of requiring users to understand technical categories, the platform allows them to explain their problem naturally.
-
-The AI then helps them navigate the local service ecosystem.
-
-🧠 Key Product Insight
-
-The core insight behind FixNear.AI is:
-
-Users often do not search for a technician because they know the technician's profession. They search because something is wrong and they need help understanding what to do next.
-
-FixNear.AI therefore begins with the user's problem rather than the service category.
-
-This creates a more natural and accessible experience for non-technical users.
-
-🎓 Project Significance
-
-This project demonstrates how AI can be applied to a practical everyday problem rather than being used only for general conversation or content generation.
-
-FixNear.AI combines:
-
-Natural-language AI
-Localized service discovery
-Marketplace design
-Location-aware filtering
-Structured AI output
-User request workflows
-Tracking functionality
-Pakistan-specific localization
-
-The project demonstrates a complete product development cycle:
-
-REAL-WORLD PROBLEM
-        ↓
-PRODUCT IDEA
-        ↓
-USER FLOW
-        ↓
-AI FEATURE
-        ↓
-FUNCTIONAL WEBSITE
-        ↓
-LIVE DEPLOYMENT
-        ↓
-PUBLIC GITHUB REPOSITORY
